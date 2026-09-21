@@ -1,9 +1,9 @@
 // IS-Net (general use): weights by Xuebin Qin et al. (DIS, Apache-2.0), ONNX graph
 // exported by the rembg project (MIT), repackaged for the web by Ko033 on Hugging Face.
 // Override with NEXT_PUBLIC_MODEL_BASE_URL to self-host the files (see README).
-const BASE =
-  process.env.NEXT_PUBLIC_MODEL_BASE_URL ??
-  "https://huggingface.co/Ko033/isnet-general-use-onnx/resolve/main/onnx";
+const DEFAULT_BASE = "https://huggingface.co/Ko033/isnet-general-use-onnx/resolve/main/onnx";
+// An empty value (e.g. pasted from .env.example) counts as "not set", never as a broken base URL.
+const BASE = process.env.NEXT_PUBLIC_MODEL_BASE_URL?.trim().replace(/\/+$/, "") || DEFAULT_BASE;
 
 export const MODELS = {
   // ~88 MB, used when WebGPU with shader-f16 is available.
