@@ -1,171 +1,188 @@
-# Unscene
+<h1 align="center">Unscene</h1>
 
-**Remove the background. Keep the subject.**
+<p align="center"><strong>Arka plan gitsin. Konu kalsın.</strong></p>
 
-A free, ad-free background remover with no account. The model runs inside your
-browser, so your image is never uploaded anywhere.
+<p align="center">
+  <a href="https://nextjs.org"><img alt="Next.js 16" src="https://img.shields.io/badge/NEXT.JS_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white"></a>
+  <a href="https://react.dev"><img alt="React 19" src="https://img.shields.io/badge/REACT_19-61DAFB?style=for-the-badge&logo=react&logoColor=black"></a>
+  <a href="https://www.typescriptlang.org"><img alt="TypeScript" src="https://img.shields.io/badge/TYPESCRIPT-3178C6?style=for-the-badge&logo=typescript&logoColor=white"></a>
+  <a href="https://tailwindcss.com"><img alt="Tailwind CSS v4" src="https://img.shields.io/badge/TAILWIND_CSS_V4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white"></a>
+  <a href="https://onnxruntime.ai"><img alt="ONNX Runtime" src="https://img.shields.io/badge/ONNX_RUNTIME-005CED?style=for-the-badge&logo=onnx&logoColor=white"></a>
+  <a href="https://webassembly.org"><img alt="WebAssembly" src="https://img.shields.io/badge/WEBASSEMBLY-654FF0?style=for-the-badge&logo=webassembly&logoColor=white"></a>
+  <a href="https://www.w3.org/TR/webgpu/"><img alt="WebGPU" src="https://img.shields.io/badge/WEBGPU-005A9C?style=for-the-badge&logo=webgpu&logoColor=white"></a>
+  <a href="https://vercel.com"><img alt="Vercel" src="https://img.shields.io/badge/VERCEL-000000?style=for-the-badge&logo=vercel&logoColor=white"></a>
+</p>
 
-- English and Turkish, light and dark
-- JPG, PNG and WEBP in, transparent PNG out (`original-name-no-bg.png`)
-- Drag and drop anywhere on the page, click to browse, or paste
-- Before/after slider on a checkerboard, keyboard accessible
-- No server-side processing, no paid API, no environment variables required
+Ücretsiz, reklamsız ve hesap gerektirmeyen bir arka plan silici. Model tarayıcının
+içinde çalışır, bu yüzden görselin hiçbir yere yüklenmez.
 
-## Technology stack
+## Özellikler
 
-| Piece | Choice |
+- İngilizce ve Türkçe, açık ve koyu tema
+- Girdi olarak JPG, PNG ve WEBP, çıktı olarak şeffaf PNG (`dosya-adi-no-bg.png`)
+- Sayfanın herhangi bir yerine sürükle-bırak, tıklayıp seç ya da yapıştır
+- Dama deseni üzerinde önce/sonra kaydırıcısı, klavyeyle de kullanılabilir
+- Sunucuda işlem yok, ücretli API yok, ortam değişkeni gerekmez
+
+## Teknoloji yığını
+
+| Parça | Seçim |
 | --- | --- |
 | Framework | Next.js 16 (App Router), React 19, TypeScript |
-| Styling | Tailwind CSS 4, CSS variables for the design tokens |
-| Inference | ONNX Runtime Web 1.30 in a Web Worker |
-| Model | IS-Net (general use), int8 on WebAssembly or fp16 on WebGPU |
-| Icons | Lucide, plus two hand-drawn brand icons (Lucide 1.x dropped brand icons) |
-| Fonts | Outfit via `next/font` (self-hosted at build time) |
+| Stil | Tailwind CSS 4, tasarım değerleri için CSS değişkenleri |
+| Çıkarım | Bir Web Worker içinde ONNX Runtime Web 1.30 |
+| Model | IS-Net (general use), WebAssembly'de int8 ya da WebGPU'da fp16 |
+| İkonlar | Lucide ve elle çizilmiş iki marka ikonu (Lucide 1.x marka ikonlarını kaldırdı) |
+| Yazı tipi | `next/font` ile Outfit (derleme sırasında kendi sunucundan sunulur) |
 
-Runtime dependencies are `next`, `react`, `react-dom`, `onnxruntime-web` and `lucide-react`. Nothing else.
+Çalışma zamanı bağımlılıkları `next`, `react`, `react-dom`, `onnxruntime-web` ve `lucide-react`. Başka bir şey yok.
 
-## How background removal works
+## Arka plan kaldırma nasıl çalışır
 
-1. The page hands your file to a **Web Worker**, so the UI stays responsive.
-2. The worker decodes the image (`createImageBitmap`, EXIF orientation respected) and
-   resizes a copy to 1024 x 1024 for the network.
-3. On first use it downloads the model, streams it with real byte progress, and stores
-   it in **Cache Storage**. Later visits skip the download.
-4. ONNX Runtime Web runs the model. If the browser has WebGPU with `shader-f16`, it uses
-   the fp16 model on the GPU. Otherwise it uses the int8 model on WebAssembly
-   (multi-threaded when the page is cross-origin isolated). If WebGPU fails at any point
-   the worker falls back to WebAssembly on its own.
-5. The output is a soft alpha matte. It is min-max normalised, levelled slightly to drop
-   faint noise, scaled to the original size and applied to the full-resolution image with
-   an `OffscreenCanvas` (`destination-in`), then exported as PNG.
+1. Sayfa dosyanı bir **Web Worker**'a verir, böylece arayüz akıcı kalır.
+2. Worker görseli çözer (`createImageBitmap`, EXIF yönü korunur) ve ağ için bir kopyasını
+   1024 x 1024'e boyutlandırır.
+3. İlk kullanımda modeli indirir, gerçek bayt ilerlemesiyle akıtır ve **Cache Storage**'a
+   kaydeder. Sonraki ziyaretlerde indirme atlanır.
+4. ONNX Runtime Web modeli çalıştırır. Tarayıcıda `shader-f16` destekli WebGPU varsa
+   fp16 modelini GPU'da kullanır. Yoksa int8 modelini WebAssembly'de çalıştırır (sayfa
+   cross-origin isolated ise çok iş parçacıklı). WebGPU herhangi bir noktada başarısız
+   olursa worker kendiliğinden WebAssembly'ye geçer.
+5. Çıktı yumuşak bir alfa matıdır. Min-maks normalleştirilir, hafif gürültüyü atmak için
+   hafifçe seviyelendirilir, orijinal boyuta ölçeklenir ve tam çözünürlüklü görsele
+   `OffscreenCanvas` ile (`destination-in`) uygulanıp PNG olarak dışa aktarılır.
 
-Limits: 25 MB per file. The long side is capped at 4096 px (2560 px on devices reporting
-4 GB of RAM or less). The worker is terminated after 90 seconds of idleness to release
-the model's memory.
+Sınırlar: dosya başına 25 MB. Uzun kenar 4096 px ile sınırlıdır (4 GB ve altı RAM bildiren
+cihazlarda 2560 px). Worker, modelin belleğini serbest bırakmak için 90 saniye boşta
+kalınca sonlandırılır.
 
-### Why this technology
+### Neden bu teknoloji
 
-- **Client-side is the only architecture that keeps the privacy promise honest and costs
-  nothing to host.** Server-side inference would need long-running or GPU compute, which
-  Vercel Free does not provide.
-- **`@imgly/background-removal` was evaluated and not used.** It is a good library, but it
-  is licensed AGPL-3.0, which would force this whole project under AGPL. Its IS-Net
-  weights descend from the same Apache-2.0 upstream used here, so nothing is lost.
-- **RMBG-1.4 and RMBG-2.0 were rejected** because their licenses are non-commercial.
-- **BiRefNet_lite (MIT)** is a fine alternative and sharper on hair, but its smallest
-  usable ONNX is 114 MB, too heavy for a first load on mobile.
-- **ONNX Runtime Web directly, not Transformers.js**, to keep the dependency tree small
-  and control the download, caching and fallback behaviour.
+- **İstemci tarafı, gizlilik sözünü dürüst tutan ve barındırması hiçbir şeye mal olmayan
+  tek mimaridir.** Sunucu tarafı çıkarım, uzun süre çalışan ya da GPU'lu bir işlem gücü
+  gerektirir. Vercel Free bunu sağlamaz.
+- **`@imgly/background-removal` değerlendirildi ve kullanılmadı.** İyi bir kütüphane ama
+  AGPL-3.0 lisanslı, bu da projenin tamamını AGPL'ye zorlardı. IS-Net ağırlıkları, burada
+  kullanılan Apache-2.0 kaynağın aynısından geliyor, yani bir şey kaybedilmiyor.
+- **RMBG-1.4 ve RMBG-2.0 reddedildi**, çünkü lisansları ticari kullanıma kapalı.
+- **BiRefNet_lite (MIT)** iyi bir alternatif ve saçta daha keskin, ama kullanılabilir en
+  küçük ONNX dosyası 114 MB. Mobilde ilk yükleme için fazla ağır.
+- **Transformers.js yerine doğrudan ONNX Runtime Web**, bağımlılık ağacını küçük tutmak ve
+  indirme, önbellekleme ve yedek davranışlarını kontrol etmek için.
 
-## Privacy
+## Gizlilik
 
-- Images are processed on your device and never sent to a server.
-- Images are held in memory only while the tab is open. Nothing is written to disk or cache.
-- The **model file** is downloaded from Hugging Face's CDN on first use (about 46 MB, or
-  88 MB on WebGPU) and cached in your browser. Hugging Face and Vercel see ordinary
-  request data such as IP address, like any host. Your image is not part of any request.
-- No analytics, no cookies. `localStorage` stores your language and theme choice only.
+- Görseller cihazında işlenir ve hiçbir sunucuya gönderilmez.
+- Görseller yalnızca sekme açıkken bellekte tutulur. Diske ya da önbelleğe hiçbir şey yazılmaz.
+- **Model dosyası** ilk kullanımda Hugging Face'in CDN'inden indirilir (yaklaşık 46 MB,
+  WebGPU'da 88 MB) ve tarayıcında önbelleğe alınır. Hugging Face ve Vercel, her barındırıcı
+  gibi IP adresi gibi olağan istek verilerini görür. Görselin hiçbir isteğin parçası değildir.
+- Analitik yok, çerez yok. `localStorage` yalnızca dil ve tema tercihini saklar.
 
-## Local development
+## Yerel geliştirme
 
 ```bash
-npm install        # also copies the ONNX Runtime WASM files into public/ort
+npm install        # ONNX Runtime WASM dosyalarını public/ort içine de kopyalar
 npm run dev        # http://localhost:3000
 ```
 
-Other scripts: `npm run lint`, `npm run typecheck`, `npm run build`, `npm start`.
+Diğer komutlar: `npm run lint`, `npm run typecheck`, `npm run build`, `npm start`.
 
-`public/ort/` is generated (by `scripts/copy-ort.mjs` on `postinstall`, `predev` and
-`prebuild`) and git-ignored. ONNX Runtime needs its `.wasm` binaries and loaders served
-from your own origin so multi-threading works without a third-party CDN.
+`public/ort/` üretilen bir klasördür (`postinstall`, `predev` ve `prebuild` sırasında
+`scripts/copy-ort.mjs` tarafından) ve git tarafından yok sayılır. ONNX Runtime'ın `.wasm`
+dosyalarını ve yükleyicilerini kendi origin'inden sunması gerekir; böylece üçüncü taraf
+CDN olmadan çok iş parçacıklı çalışma mümkün olur.
 
-## Deploying to Vercel
+## Vercel'e yayınlama
 
-No configuration is needed. Import the repo, keep the defaults, deploy.
+Ayar gerekmez. Repoyu içe aktar, varsayılanları koru, yayınla.
 
-- Everything is static. There are no serverless functions and no server-side processing.
-- `next.config.ts` sends `Cross-Origin-Opener-Policy: same-origin` and
-  `Cross-Origin-Embedder-Policy: require-corp` on every route. This enables
-  `SharedArrayBuffer` for multi-threaded WebAssembly. Anything you add later that loads
-  cross-origin sub-resources (images, iframes, scripts) must be CORS/CORP-enabled.
-- Optional: set `NEXT_PUBLIC_SITE_URL` to your domain for correct Open Graph and sitemap URLs.
-- Vercel's Hobby plan is meant for personal, non-commercial use. This project is free
-  and ad-free, which fits, but check Vercel's terms for your situation.
-- The `public/ort` files are about 41 MB in total and are only downloaded by visitors
-  who process an image. They are cached with a one-year `immutable` header under a
-  versioned path.
+- Her şey statiktir. Serverless fonksiyon ve sunucu tarafı işlem yoktur.
+- `next.config.ts` her rotada `Cross-Origin-Opener-Policy: same-origin` ve
+  `Cross-Origin-Embedder-Policy: require-corp` başlıklarını gönderir. Bu, çok iş
+  parçacıklı WebAssembly için `SharedArrayBuffer`'ı etkinleştirir. Sonradan eklediğin ve
+  cross-origin alt kaynak yükleyen her şey (görseller, iframe'ler, script'ler) CORS/CORP
+  etkin olmalıdır.
+- İsteğe bağlı: doğru Open Graph ve sitemap adresleri için `NEXT_PUBLIC_SITE_URL`
+  değişkenini alan adına ayarla.
+- Vercel'in Hobby planı kişisel, ticari olmayan kullanım içindir. Bu proje ücretsiz ve
+  reklamsız olduğu için uyuyor, yine de durumun için Vercel'in şartlarına bak.
+- `public/ort` dosyaları toplamda yaklaşık 41 MB'tır ve yalnızca görsel işleyen ziyaretçiler
+  tarafından indirilir. Sürümlü bir yol altında, bir yıllık `immutable` başlığıyla önbelleğe alınır.
 
-### Self-hosting the model
+### Modeli kendi sunucunda barındırma
 
-The default model files come from a public Hugging Face repository
-(`Ko033/isnet-general-use-onnx`). It is a third-party repackaging, so if you need
-guarantees, host the files yourself:
+Varsayılan model dosyaları herkese açık bir Hugging Face reposundan gelir
+(`Ko033/isnet-general-use-onnx`). Bu, üçüncü tarafın yeniden paketlemesidir. Garanti
+istiyorsan dosyaları kendin barındır:
 
-1. Download `model_fp16.onnx` and `model_quantized.onnx` from that repo.
-2. Serve them from any CORS-enabled static host (or your own `public/` folder, keeping in
-   mind Vercel Free's bandwidth allowance).
-3. Set `NEXT_PUBLIC_MODEL_BASE_URL` to the folder URL and rebuild. If you change the
-   files, update the byte sizes in `src/lib/model.ts`.
+1. O repodan `model_fp16.onnx` ve `model_quantized.onnx` dosyalarını indir.
+2. CORS etkin herhangi bir statik barındırıcıdan sun (ya da kendi `public/` klasöründen,
+   Vercel Free'nin bant genişliği payını göz önünde bulundurarak).
+3. `NEXT_PUBLIC_MODEL_BASE_URL` değişkenini klasör adresine ayarla ve yeniden derle.
+   Dosyaları değiştirirsen `src/lib/model.ts` içindeki bayt boyutlarını da güncelle.
 
-## Model and license information
+## Model ve lisans bilgileri
 
-| Component | Author | License |
+| Bileşen | Yazar | Lisans |
 | --- | --- | --- |
-| IS-Net weights and architecture (DIS) | Xuebin Qin et al. | Apache-2.0 |
-| `isnet-general-use.onnx` export | rembg project | MIT |
-| fp16 and int8 variants, auxiliary outputs stripped | Ko033 on Hugging Face | Apache-2.0 (as declared on the model card) |
+| IS-Net ağırlıkları ve mimarisi (DIS) | Xuebin Qin et al. | Apache-2.0 |
+| `isnet-general-use.onnx` dışa aktarımı | rembg projesi | MIT |
+| fp16 ve int8 varyantları, yardımcı çıktıları çıkarılmış | Hugging Face'te Ko033 | Apache-2.0 (model kartında belirtildiği gibi) |
 | ONNX Runtime Web | Microsoft | MIT |
 | Next.js, React | Vercel, Meta | MIT |
-| Lucide icons | Lucide contributors | ISC |
+| Lucide ikonları | Lucide katkıda bulunanlar | ISC |
 | Outfit | Outfit Project Authors | SIL OFL 1.1 |
 
-Model pages:
+Model sayfaları:
 [DIS](https://github.com/xuebinqin/DIS) ·
 [rembg](https://github.com/danielgatis/rembg) ·
 [Ko033/isnet-general-use-onnx](https://huggingface.co/Ko033/isnet-general-use-onnx).
-Licenses above were read from those upstream pages at the time of writing. Re-check them
-before commercial redistribution of the model files.
+Yukarıdaki lisanslar, yazıldığı sırada bu kaynak sayfalardan okundu. Model dosyalarını
+ticari olarak yeniden dağıtmadan önce tekrar kontrol et.
 
-## Design system
+## Tasarım sistemi
 
-Soft, light and rounded, with one geometric typeface. The layout follows a reference
-mockup; the colours are exactly the four in its palette sheet.
+Yumuşak, açık ve yuvarlak hatlı, tek bir geometrik yazı tipiyle. Yerleşim bir referans
+taslağı izler; renkler tam olarak onun palet sayfasındaki dört renktir.
 
-| Role | Colour |
+| Rol | Renk |
 | --- | --- |
-| Primary | `#0B3D91` |
-| Secondary | `#3BA7F2` |
-| Tertiary | `#7FE7D6` |
-| Background | `#E8F6FF` |
+| Birincil | `#0B3D91` |
+| İkincil | `#3BA7F2` |
+| Üçüncül | `#7FE7D6` |
+| Arka plan | `#E8F6FF` |
 
-Surfaces, ink, muted text and lines are derived from these (tints and mixes), never
-introduced as new hues. The site always opens in light mode; dark is opt-in and remembered.
-Dark mode uses a mid navy (`#182D5A`) built from the primary, the palette background as
-ink, secondary for accents and tertiary for the main button.
+Yüzeyler, yazı, soluk yazı ve çizgiler bunlardan türetilir (tonlar ve karışımlar), yeni bir
+ton eklenmez. Site her zaman açık temayla açılır, koyu tema isteğe bağlıdır ve hatırlanır.
+Koyu tema, birincil renkten türetilen orta tonda bir lacivert (`#182D5A`) kullanır. Yazı
+rengi olarak palet arka planı, vurgular için ikincil, ana buton için üçüncül renk kullanılır.
 
-- **Controls** language is plain `EN / TR` text with the active one bold and underlined; the
-  theme switch is two ghost icons with a soft circle behind the active one.
-- **Radius** 8 (small controls), 12 (buttons), 20 (cards, dropzone), full for chips and pills.
-- **Border** 1px, dropzone 1.5px dashed. **Shadow** one soft two-layer shadow.
-- **Type** Outfit only: 500 for display, 400 for body, 500 uppercase for labels.
-- **Motion** 120 ms micro, 200 ms state, 600 ms reveal. All of it collapses under
-  `prefers-reduced-motion`.
-- Tokens live in `src/app/globals.css`; components share `.btn`, `.chip`, `.card`, `.dz`,
-  `.icon-btn` and `.lang-btn` instead of inventing their own styles.
-- Contrast note: the second hero line uses the secondary colour (`#3BA7F2`) on the light
-  background. That is about 2.4:1, fine for very large display type but below WCAG's 3:1.
-  Switch `--display-2` to `--primary` in `globals.css` if you need it to pass.
+- **Kontroller:** dil düz `EN / TR` metnidir, aktif olan kalın ve altı çizgilidir. Tema
+  anahtarı iki hayalet ikondur, aktif olanın arkasında yumuşak bir daire durur.
+- **Köşe yuvarlaklığı:** 8 (küçük kontroller), 12 (butonlar), 20 (kartlar, dropzone), chip
+  ve hap biçimleri için tam yuvarlak.
+- **Kenarlık:** 1px, dropzone'da 1,5px kesikli. **Gölge:** tek bir yumuşak, iki katmanlı gölge.
+- **Yazı:** yalnızca Outfit. Başlıklar 500, gövde 400, büyük harfli etiketler 500.
+- **Hareket:** 120 ms mikro, 200 ms durum, 600 ms beliriş. Hepsi `prefers-reduced-motion`
+  altında devre dışı kalır.
+- Tasarım değerleri `src/app/globals.css` içindedir. Bileşenler kendi stillerini icat
+  etmek yerine `.btn`, `.chip`, `.card`, `.dz`, `.icon-btn` ve `.lang-btn` sınıflarını paylaşır.
+- Kontrast notu: ikinci hero satırı açık arka planda ikincil rengi (`#3BA7F2`) kullanır.
+  Bu yaklaşık 2,4:1'dir; çok büyük ekran yazısı için yeterli ama WCAG'ın 3:1 eşiğinin
+  altındadır. Geçmesini istersen `globals.css` içinde `--display-2` değerini `--primary`
+  yap.
 
-## Project layout
+## Proje yapısı
 
 ```
-src/app/            layout, page, metadata, icons, OG image, robots, sitemap
-src/components/     header, footer, workspace (hero/upload/result), hero-demo, sections, compare slider
-src/lib/            messages (EN/TR), prefs (locale/theme), use-remover, model config
-src/workers/        remover.worker.ts (all inference and compositing)
+src/app/            layout, sayfa, meta veriler, ikonlar, OG görseli, robots, sitemap
+src/components/     header, footer, workspace (hero/yükleme/sonuç), hero-demo, sections, compare kaydırıcısı
+src/lib/            messages (EN/TR), prefs (dil/tema), use-remover, model ayarı
+src/workers/        remover.worker.ts (tüm çıkarım ve birleştirme)
 scripts/            copy-ort.mjs
 ```
 
-## License
+## Lisans
 
-MIT, see [LICENSE](./LICENSE). Made by Çağlar Sapmaz.
+MIT, bkz. [LICENSE](./LICENSE). Çağlar Sapmaz tarafından yapıldı.
