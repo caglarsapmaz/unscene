@@ -16,6 +16,9 @@
 Ücretsiz, reklamsız ve hesap gerektirmeyen bir arka plan silici. Model tarayıcının
 içinde çalışır, bu yüzden görselin hiçbir yere yüklenmez.
 
+<img width="1920" height="878" alt="image" src="https://github.com/user-attachments/assets/6579411c-c40a-4a3a-b3d4-169ed1321e90" />
+
+
 ## Özellikler
 
 - İngilizce ve Türkçe, açık ve koyu tema
